@@ -22,13 +22,24 @@ jobs:
         run: python -m unittest discover -s tests -t . --verbose
 
   app:
-    name: Build Tally.app
-    runs-on: macos-14
+    # PyInstaller bundles a CPython for the architecture it runs on, so an
+    # Apple silicon runner produces an arm64-only app that Intel Macs cannot
+    # open at all. Build on both and ship both.
+    name: Build Tally.app (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
     needs: test
     # Needed to attach the built app to a release. Without it the build
     # succeeds and the upload fails with a 403.
     permissions:
       contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-14
+            arch: apple-silicon
+          - runner: macos-13
+            arch: intel
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -54,16 +65,17 @@ jobs:
         run: |
           pyinstaller --noconfirm --clean Tally.spec
           rm -rf dist/Tally
-          ditto -c -k --sequesterRsrc --keepParent dist/Tally.app dist/Tally.zip
+          ditto -c -k --sequesterRsrc --keepParent \
+            dist/Tally.app "dist/Tally-${{ matrix.arch }}.zip"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: Tally-app
-          path: dist/Tally.zip
+          name: Tally-${{ matrix.arch }}
+          path: dist/Tally-${{ matrix.arch }}.zip
 
       - name: Attach to release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/Tally.zip
+          files: dist/Tally-${{ matrix.arch }}.zip
           generate_release_notes: true

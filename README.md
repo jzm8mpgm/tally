@@ -55,8 +55,9 @@ drafts outside Word.
 
 ### From a release
 
-1. Download `Tally.zip` from the [latest release](../../releases/latest) and
-   unzip it.
+1. Download from the [latest release](../../releases/latest) and unzip it —
+   `Tally-apple-silicon.zip` for an M-series Mac, `Tally-intel.zip` for an
+   older one. (Apple menu → About This Mac will tell you which you have.)
 2. Drag **Tally.app** to your Applications folder.
 3. The first time, **right-click the app and choose Open**, then confirm.
 
