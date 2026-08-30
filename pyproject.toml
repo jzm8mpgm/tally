@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tally-menubar"
+version = "1.0.0"
+description = "Live word counts for the documents you are writing, in your Mac menu bar"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Matt Morgan" }]
+keywords = ["macos", "menubar", "wordcount", "docx", "writing"]
+classifiers = [
+  "Environment :: MacOS X :: Cocoa",
+  "Intended Audience :: End Users/Desktop",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: MacOS :: MacOS X",
+  "Programming Language :: Python :: 3",
+  "Topic :: Text Processing",
+]
+dependencies = [
+  "pyobjc-framework-Cocoa>=10.0",
+  "watchdog>=3.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/jzm8mpgm/tally"
+Issues = "https://github.com/jzm8mpgm/tally/issues"
+
+[project.scripts]
+tally = "tally.app:main"
+
+[tool.setuptools]
+packages = ["tally"]
