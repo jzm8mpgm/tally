@@ -11,7 +11,6 @@ from __future__ import annotations
 import objc
 from AppKit import (
     NSControlSizeSmall,
-    NSImage,
     NSLeftTextAlignment,
     NSNoBorder,
     NSRightTextAlignment,
@@ -44,24 +43,6 @@ GOAL_ROW_HEIGHT = 16
 CAPTION_HEIGHT = 14
 FOOTER_HEIGHT = 26
 EMPTY_HEIGHT = 52
-
-
-def _symbol(name: str, fallback: str = ""):
-    """An SF Symbol image, or a stock one on systems that lack it."""
-    image = None
-    if hasattr(NSImage, "imageWithSystemSymbolName_accessibilityDescription_"):
-        try:
-            image = NSImage.imageWithSystemSymbolName_accessibilityDescription_(
-                name, None
-            )
-        except Exception:
-            image = None
-    if image is None and fallback:
-        image = NSImage.imageNamed_(fallback)
-    if image is not None:
-        image.setTemplate_(True)
-        image.setSize_(NSMakeSize(14, 14))
-    return image
 
 
 class PanelController(NSViewController):
@@ -105,9 +86,7 @@ class PanelController(NSViewController):
         self._more = IconButton.alloc().initWithFrame_(
             NSMakeRect(width - PAD - 16, 0, 26, 22)
         )
-        self._more.configure(
-            _symbol("ellipsis.circle", "NSActionTemplate"), self._settings_clicked
-        )
+        self._more.configure(self._settings_clicked)
         root.addSubview_(self._more)
 
         self._total_label = make_label(

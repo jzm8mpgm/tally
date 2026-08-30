@@ -19,7 +19,6 @@ import objc
 from AppKit import (
     NSBezierPath,
     NSCenterTextAlignment,
-    NSCompositingOperationSourceOver,
     NSCursor,
     NSLeftTextAlignment,
     NSLineBreakByTruncatingTail,
@@ -557,19 +556,23 @@ class PillButton(HoverView):
 
 
 class IconButton(HoverView):
-    """A borderless button showing a template image."""
+    """A borderless ellipsis button.
+
+    The dots are drawn rather than taken from an SF Symbol on purpose. A
+    template image is only tinted when AppKit hosts it inside a control —
+    drawn by hand with ``drawInRect_`` it renders as literal black, which on
+    a dark popover is invisible. Three circles always have the right colour.
+    """
 
     def initWithFrame_(self, frame):  # noqa: N802
         self = objc.super(IconButton, self).initWithFrame_(frame)
         if self is None:
             return None
-        self._image = None
         self._action = None
         return self
 
     @objc.python_method
-    def configure(self, image, action):
-        self._image = image
+    def configure(self, action):
         self._action = action
         self.setNeedsDisplay_(True)
 
@@ -577,12 +580,9 @@ class IconButton(HoverView):
         self.addCursorRect_cursor_(self.bounds(), NSCursor.pointingHandCursor())
 
     def acceptsFirstMouse_(self, event):  # noqa: N802
-        # The popover may not be key yet; the first click should still count.
         return True
 
     def mouseDown_(self, event):  # noqa: N802
-        # Claim the event so that mouseUp_ is delivered here rather than
-        # being passed up the responder chain.
         pass
 
     def mouseUp_(self, event):  # noqa: N802
@@ -593,28 +593,14 @@ class IconButton(HoverView):
         bounds = self.bounds()
         if self._hovering:
             theme.hover_fill().set()
-            rounded(bounds, theme.CORNER).fill()
-        if self._image is None:
-            # Fall back to three dots so the control is never invisible.
-            draw_text(
-                "•••",
-                theme.font_caption(),
-                theme.secondary(),
-                bounds,
-                alignment=NSCenterTextAlignment,
-            )
-            return
-        size = self._image.size()
-        self._image.drawInRect_fromRect_operation_fraction_respectFlipped_hints_(
-            NSMakeRect(
-                (bounds.size.width - size.width) / 2.0,
-                (bounds.size.height - size.height) / 2.0,
-                size.width,
-                size.height,
-            ),
-            NSMakeRect(0, 0, 0, 0),
-            NSCompositingOperationSourceOver,
-            1.0 if self._hovering else 0.7,
-            True,
-            None,
-        )
+            rounded(bounds, bounds.size.height / 2.0).fill()
+
+        (theme.primary() if self._hovering else theme.secondary()).set()
+        diameter = 3.0
+        spacing = 5.0
+        centre_y = bounds.size.height / 2.0 - diameter / 2.0
+        first_x = (bounds.size.width - (diameter + spacing * 2)) / 2.0
+        for index in range(3):
+            NSBezierPath.bezierPathWithOvalInRect_(
+                NSMakeRect(first_x + index * spacing, centre_y, diameter, diameter)
+            ).fill()
