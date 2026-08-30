@@ -39,6 +39,13 @@ jobs:
       - name: Draw the app icon
         run: python tools/make_icon.py
 
+      # PyObjC validates selector signatures when a class is defined, so simply
+      # importing the AppKit layer on a real Mac catches a whole family of
+      # mistakes that never show up on Linux.
+      - name: Import the AppKit layer
+        run: |
+          python -c "import tally.theme, tally.icons, tally.views, tally.panel, tally.app; print('AppKit layer imports cleanly')"
+
       - name: Build
         run: |
           pyinstaller --noconfirm --clean Tally.spec
