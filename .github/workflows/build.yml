@@ -25,6 +25,10 @@ jobs:
     name: Build Tally.app
     runs-on: macos-14
     needs: test
+    # Needed to attach the built app to a release. Without it the build
+    # succeeds and the upload fails with a 403.
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
