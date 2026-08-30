@@ -4,6 +4,25 @@ Written by the coding session, read by the planning session. Newest first.
 
 ---
 
+## 2026-08-30 — First run on a real Mac; popover sizing fixed; 2wish added
+
+Matt ran it. The menu bar count works. One real bug: the popover kept the
+content size it had when first shown — the empty state, before any documents
+were added — so once documents arrived the panel was about 125pt too short and
+the header, the total and the subtitle were clipped off the top edge.
+
+`setPreferredContentSize_` alone does not move an NSPopover that has already
+been displayed. The fix is for the panel to hold a reference to its popover and
+set `contentSize` directly at the end of `_layout`. See
+`panel.py::attach_popover`.
+
+Also added donation routing to 2wish rather than to the author: a `⋯ → Support
+2wish…` menu item, a button in the About box, `.github/FUNDING.yml` for the
+repo's Sponsor button, and a README section. Attribution is carried two ways —
+UTM tags on the URL for 2wish's analytics, and a prompt asking donors to write
+"Tally" in the donation form's message box, which is what actually reaches a
+human.
+
 ## 2026-08-30 — Rebuild and first publish (Cowork planning session)
 
 Replaced the original draft entirely. It had been two separate programs — a

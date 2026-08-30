@@ -74,10 +74,21 @@ class PanelController(NSViewController):
         if self is None:
             return None
         self._app = app
+        self._popover = None
         self._rows = []
         self._row_paths = []
         self._subtitle_text = ""
         return self
+
+    @objc.python_method
+    def attach_popover(self, popover):
+        """The panel resizes its own popover.
+
+        NSPopover latches onto whatever content size it had when it was first
+        shown; ``preferredContentSize`` alone does not reliably move it
+        afterwards. Setting ``contentSize`` directly does.
+        """
+        self._popover = popover
 
     def loadView(self):  # noqa: N802
         width = PANEL_WIDTH
@@ -372,6 +383,8 @@ class PanelController(NSViewController):
         )
         y += FOOTER_HEIGHT + PAD - 4
 
-        height = float(round(y))
-        self.view().setFrameSize_(NSMakeSize(PANEL_WIDTH, height))
-        self.setPreferredContentSize_(NSMakeSize(PANEL_WIDTH, height))
+        size = NSMakeSize(PANEL_WIDTH, float(round(y)))
+        self.view().setFrameSize_(size)
+        self.setPreferredContentSize_(size)
+        if self._popover is not None:
+            self._popover.setContentSize_(size)

@@ -49,6 +49,18 @@ from .store import (
 )
 
 HOMEPAGE = "https://github.com/jzm8mpgm/tally"
+
+# Tally is free. If it earns anything, it goes to 2wish, which supports
+# families bereaved by the sudden death of a child or young adult.
+# The UTM tags let 2wish see in their analytics that a visitor arrived from
+# the app; the message field, which the donation flow asks for anyway, is
+# what actually tells them by name.
+DONATION_URL = (
+    "https://2wish.enthuse.com/donate"
+    "?utm_source=tally&utm_medium=macapp&utm_campaign=tally-for-2wish"
+    "#!/"
+)
+
 SAVE_INTERVAL = 45.0
 
 FILE_TYPES = sorted(ext.lstrip(".") for ext in SUPPORTED_EXTS)
@@ -80,6 +92,7 @@ class TallyApp(NSObject):
         self._popover.setContentViewController_(self._panel)
         self._popover.setBehavior_(NSPopoverBehaviorTransient)
         self._popover.setAnimates_(True)
+        self._panel.attach_popover(self._popover)
 
         self.engine.resync_watches()
         self.engine.refresh()
@@ -336,6 +349,7 @@ class TallyApp(NSObject):
 
         menu.addItem_(NSMenuItem.separatorItem())
         self._item(menu, "Refresh Now", "refreshNow:")
+        self._item(menu, "Support 2wish…", "donate:")
         self._item(menu, f"About Tally {__version__}", "showAbout:")
         menu.addItem_(NSMenuItem.separatorItem())
         self._item(menu, "Quit Tally", "quitTally:")
@@ -425,19 +439,45 @@ class TallyApp(NSObject):
         self.engine.cache.clear()
         self._reload()
 
+    def donate_(self, sender):  # noqa: N802
+        self._close_popover()
+        alert = NSAlert.alloc().init()
+        alert.setMessageText_("Tally is free")
+        alert.setInformativeText_(
+            "If it has been useful, consider giving to 2wish instead — a "
+            "charity supporting families bereaved by the sudden and "
+            "unexpected death of a child or young adult.\n\n"
+            "The donation form has a message box. Putting “Tally” in it lets "
+            "them see the app brought you there."
+        )
+        alert.addButtonWithTitle_("Donate to 2wish")
+        alert.addButtonWithTitle_("Not now")
+        NSApp.activateIgnoringOtherApps_(True)
+        if alert.runModal() == NSAlertFirstButtonReturn:
+            NSWorkspace.sharedWorkspace().openURL_(
+                NSURL.URLWithString_(DONATION_URL)
+            )
+
     def showAbout_(self, sender):  # noqa: N802
         self._close_popover()
         alert = NSAlert.alloc().init()
         alert.setMessageText_(f"Tally {__version__}")
         alert.setInformativeText_(
             "Live word counts for the documents you are writing, in your "
-            "menu bar.\n\nFree and open source, under the MIT licence."
+            "menu bar.\n\nFree and open source, under the MIT licence. "
+            "If it has been useful, please give to 2wish rather than to me."
         )
         alert.addButtonWithTitle_("Close")
         alert.addButtonWithTitle_("View on GitHub")
+        alert.addButtonWithTitle_("Support 2wish")
         NSApp.activateIgnoringOtherApps_(True)
-        if alert.runModal() != NSAlertFirstButtonReturn:
+        response = alert.runModal()
+        if response == NSAlertFirstButtonReturn + 1:
             NSWorkspace.sharedWorkspace().openURL_(NSURL.URLWithString_(HOMEPAGE))
+        elif response == NSAlertFirstButtonReturn + 2:
+            NSWorkspace.sharedWorkspace().openURL_(
+                NSURL.URLWithString_(DONATION_URL)
+            )
 
     def quitTally_(self, sender):  # noqa: N802
         self.engine.stop()

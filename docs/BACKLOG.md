@@ -33,26 +33,34 @@ Worth checking specifically, because these are the parts I could not verify:
 - Save a document in Word and time how long until the number moves. Should be
   under a second; the debounce is 0.35s in `engine.py`.
 
-## 2. Replace the hero image with a real screenshot
+## 2. Consider a dedicated 2wish fundraising page
+
+Right now donations go to 2wish's general donate form, and attribution rests on
+donors typing "Tally" into the message box, which most will not do. An Enthuse
+fundraising page created for Tally would give a real running total and a page
+that can be linked to and celebrated. Needs an account and a decision from
+Matt; worth it only if the app finds an audience.
+
+## 3. Replace the hero image with a real screenshot
 
 `assets/hero.png` is a rendering of the design, not a photograph of the app.
 It is honest as a mockup but it should not stay in the README once the real
 thing exists. Shift-Cmd-4, then Space, then click the panel.
 
-## 3. Verify the count against Word itself
+## 4. Verify the count against Word itself
 
 Open a real manuscript in Word, note its count, and compare. A small gap is
 expected and documented (Tally does not count punctuation-only tokens) but a
 large one means the extraction is wrong. If they diverge badly, the place to
 look is `counter.py::_docx_text` and which tags are treated as breaks.
 
-## 4. Decide on the GitHub account
+## 5. Decide on the GitHub account
 
 The repo is on `jzm8mpgm`, which has no display name and looks auto-generated.
 If this is to be a public project with Matt's name on it, that should be
 settled before it gets any attention.
 
-## 5. Code signing and notarisation
+## 6. Code signing and notarisation
 
 Every new user currently meets "unidentified developer" and has to right-click
 to open. An Apple Developer account (£79/year) removes that, and the signing
