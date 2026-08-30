@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import signal
 import time
 
 import objc
@@ -64,6 +65,27 @@ DONATION_URL = (
 SAVE_INTERVAL = 45.0
 
 FILE_TYPES = sorted(ext.lstrip(".") for ext in SUPPORTED_EXTS)
+
+# Ctrl-C, and `kill`, when running from source.
+#
+# A Python signal handler only runs between bytecode instructions, and while
+# the AppKit event loop has control the interpreter is not executing any. The
+# handler therefore cannot quit the app itself; it raises a flag, and the
+# one-second heartbeat — the next Python code to run — acts on it. Without
+# this, Ctrl-C prints "^C" and nothing happens.
+_INTERRUPTED = []
+
+
+def _note_interrupt(signum, frame):
+    _INTERRUPTED.append(signum)
+
+
+def install_signal_handlers():
+    for signum in (signal.SIGINT, signal.SIGTERM):
+        try:
+            signal.signal(signum, _note_interrupt)
+        except (ValueError, OSError):  # not the main thread, or unsupported
+            pass
 
 
 class TallyApp(NSObject):
@@ -176,6 +198,10 @@ class TallyApp(NSObject):
     # ── heartbeat ────────────────────────────────────────────────────
 
     def tick_(self, timer):  # noqa: N802
+        if _INTERRUPTED:
+            self.quitTally_(None)
+            return
+
         if self.engine.tick():
             self._update_status_title()
             if self._popover.isShown():
@@ -533,6 +559,8 @@ def main() -> int:
 
     application = NSApplication.sharedApplication()
     application.setActivationPolicy_(NSApplicationActivationPolicyAccessory)
+
+    install_signal_handlers()
 
     delegate = TallyApp.alloc().init()
     application.setDelegate_(delegate)
