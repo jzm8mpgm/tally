@@ -51,11 +51,11 @@ from .store import (
 
 HOMEPAGE = "https://github.com/jzm8mpgm/tally"
 
-# Tally is free. If it earns anything, it goes to 2Wish, whose mission is that
+# Tally is free. If it earns anything, it goes to 2wish, whose mission is that
 # everyone affected by the sudden death of a child or young adult aged 25 or
 # under has the bereavement support they need.
 #
-# The UTM tags let 2Wish see in their analytics that a visitor arrived from the
+# The UTM tags let 2wish see in their analytics that a visitor arrived from the
 # app. The message field, which the donation flow asks for anyway, is what
 # actually tells them by name. Keep the UTM values lowercase and unchanged —
 # they are compared as literal strings at the other end.
@@ -378,7 +378,7 @@ class TallyApp(NSObject):
 
         menu.addItem_(NSMenuItem.separatorItem())
         self._item(menu, "Refresh Now", "refreshNow:")
-        self._item(menu, "Support 2Wish…", "donate:")
+        self._item(menu, "Support 2wish…", "donate:")
         self._item(menu, f"About Tally {__version__}", "showAbout:")
         menu.addItem_(NSMenuItem.separatorItem())
         self._item(menu, "Quit Tally", "quitTally:")
@@ -471,20 +471,21 @@ class TallyApp(NSObject):
     def donate_(self, sender):  # noqa: N802
         self._close_popover()
         alert = NSAlert.alloc().init()
-        alert.setMessageText_("Tally is free — 2Wish is not")
+        alert.setMessageText_("Tally is free — 2wish is not")
         alert.setInformativeText_(
-            "If Tally has been useful, please give to 2Wish rather than to me."
+            "If Tally has been useful, please give to 2wish rather than to me."
             "\n\n"
             "Their mission is that everyone affected by the sudden and "
             "unexpected death of a child or young adult aged 25 or under has "
-            "the bereavement support they need and deserve. They are there in "
-            "the first hours, at the hospital or with the police, and they "
-            "stay — counselling, play therapy for younger siblings, support "
-            "groups — for as long as a family needs them.\n\n"
+            "the bereavement support they need and deserve.\n\n"
+            "As an intensive care doctor, I sit with families in the worst "
+            "hours of their lives more often than I would wish, and I have "
+            "seen first hand what a difference genuine bereavement support "
+            "makes when someone dies suddenly or unexpectedly.\n\n"
             "The donation form has a message box. Putting “Tally” in it lets "
             "them see the app brought you there."
         )
-        alert.addButtonWithTitle_("Donate to 2Wish")
+        alert.addButtonWithTitle_("Donate to 2wish")
         alert.addButtonWithTitle_("Not now")
         NSApp.activateIgnoringOtherApps_(True)
         if alert.runModal() == NSAlertFirstButtonReturn:
@@ -499,13 +500,13 @@ class TallyApp(NSObject):
         alert.setInformativeText_(
             "Live word counts for the documents you are writing, in your "
             "menu bar.\n\nFree and open source, under the MIT licence. "
-            "If it has been useful, please give to 2Wish — bereavement "
+            "If it has been useful, please give to 2wish — bereavement "
             "support for families after the sudden death of a child or young "
             "adult — rather than to me."
         )
         alert.addButtonWithTitle_("Close")
         alert.addButtonWithTitle_("View on GitHub")
-        alert.addButtonWithTitle_("Support 2Wish")
+        alert.addButtonWithTitle_("Support 2wish")
         NSApp.activateIgnoringOtherApps_(True)
         response = alert.runModal()
         if response == NSAlertFirstButtonReturn + 1:

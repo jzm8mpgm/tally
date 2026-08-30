@@ -149,13 +149,13 @@ sent anywhere — Tally makes no network connections at all.
 Two dependencies: `pyobjc-framework-Cocoa` for the interface, and `watchdog`
 for the filesystem events. Word documents are parsed with the standard library.
 
-## If it helps you, help 2Wish
+## If it helps you, help 2wish
 
 Tally is free, and I am not asking for anything for it. If it has earned
-something from you, [give it to **2Wish**](https://2wish.enthuse.com/donate?utm_source=tally&utm_medium=github&utm_campaign=tally-for-2wish#!/)
+something from you, [give it to **2wish**](https://2wish.enthuse.com/donate?utm_source=tally&utm_medium=github&utm_campaign=tally-for-2wish#!/)
 instead.
 
-2Wish exists so that everyone affected by the sudden and unexpected death of a
+2wish exists so that everyone affected by the sudden and unexpected death of a
 child or young adult aged 25 or under has the bereavement support they need
 and deserve. That means being there in the first hours — at the hospital, with
 the police, when nobody has any idea what to do next — and then staying:
@@ -164,8 +164,12 @@ and help for the professionals who were in the room too.
 
 The charity was founded in Wales by Rhian Mannings after she lost her
 one-year-old son George and her husband Paul within days of each other in
-2012, having been offered nothing at all in the hours that followed. I am an
-ambassador for them, which is to say I have seen what they do.
+2012, having been offered nothing at all in the hours that followed.
+
+I am an ambassador for them. As an intensive care doctor, I sit with families
+in the worst hours of their lives more often than I would wish, and I have
+seen first hand what a difference genuine bereavement support makes when
+someone dies suddenly or unexpectedly.
 
 The donation form has a message box. If you put *Tally* in it, they will know
 where you came from.

@@ -31,9 +31,9 @@ interpreter is executing none — so `^C` echoed and nothing happened. The
 handler now raises a flag and the one-second heartbeat, being the next Python
 code to run, quits on it. SIGTERM is handled the same way.
 
-Also added: support routing to 2Wish rather than to the author — a menu item,
+Also added: support routing to 2wish rather than to the author — a menu item,
 a button in the About box, `.github/FUNDING.yml`, and a README section.
-Attribution rides on UTM tags for 2Wish's analytics and, more usefully, on a
+Attribution rides on UTM tags for 2wish's analytics and, more usefully, on a
 prompt asking donors to write "Tally" in the donation form's message box.
 
 ## 2026-08-30 — Rebuild and first publish
