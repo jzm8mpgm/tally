@@ -74,10 +74,19 @@ folder or Desktop. Tally reads the documents you point it at, and nothing else.
 ```bash
 git clone https://github.com/jzm8mpgm/tally.git
 cd tally
+```
+
+Then **double-click `Run Tally.command`**, which sets everything up and starts
+the app. Or, if you would rather do it yourself:
+
+```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 python3 -m tally
 ```
+
+To quit: the ⋯ menu in the panel, a right-click on the menu bar icon, or
+Ctrl-C in the Terminal window.
 
 To build a standalone `Tally.app`:
 

@@ -1,75 +1,71 @@
 # Backlog
 
-Written by the planning session, read by the coding session. Newest concerns
-first. When an item is done, move it to `## Done` with the date rather than
-deleting it, so the reasoning survives.
+What is wanted next, and why. Roughly in priority order. When something is
+done it moves to the bottom rather than being deleted, so the reasoning
+survives.
+
+If you are looking for somewhere to help, anything here is fair game — say so
+in an issue first so two people don't do the same work.
 
 ---
 
-## 1. Run the app and fix whatever first launch throws — blocking
+## 1. First-launch polish
 
-Nothing else matters until this is done. The interface has been checked by CI
-(it imports cleanly on a real Mac, which proves every PyObjC selector
-signature is valid) but **it has never been on a screen**. Expect layout
-imperfections and possibly a runtime error or two.
+The app runs. Three bugs from the very first launch are fixed (see Done), but
+it has only been run by one person on one Mac, so the shallow end is not yet
+well explored. Worth checking, and worth an issue if any of it is wrong:
 
-```bash
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-python3 -m tally
-```
+- The panel's height is a sum of constants in `panel.py::_layout`. Does it
+  still fit correctly with one document? With forty? With a very long
+  filename?
+- Hovering a bar in the chart should replace the subtitle with that day's
+  figure, and restore it on the way out.
+- A single click on a row opens the document; right-click offers Reveal in
+  Finder and Remove.
+- The menu bar figure uses a monospaced-digit font so it should not jitter as
+  the number changes.
+- Light mode. Everything so far has been looked at in dark mode.
+- Increased-contrast and reduce-transparency accessibility settings.
 
-Worth checking specifically, because these are the parts I could not verify:
+## 2. A real screenshot
 
-- Does the popover open at the right size, or is there dead space at the
-  bottom? The height is computed in `panel.py::_layout` as a sum of constants.
-- Does the sparkline hover work — moving across the bars should swap the
-  subtitle line for that day's figure?
-- Do document rows respond to a single click (open) and right-click (menu)?
-- Does the menu bar number stay put as it changes, or does it jitter? It uses
-  a monospaced-digit font, but the leading space may need tuning.
-- Does the `⋯` button render? It uses the SF Symbol `ellipsis.circle` with a
-  fallback to `NSActionTemplate`.
-- Save a document in Word and time how long until the number moves. Should be
-  under a second; the debounce is 0.35s in `engine.py`.
+`assets/hero.png` is a rendering of the interface, not a photograph of it. It
+is accurate, but it should be replaced by the real thing.
 
-## 2. Consider a dedicated 2wish fundraising page
+## 3. Check the count against Word itself
 
-Right now donations go to 2wish's general donate form, and attribution rests on
-donors typing "Tally" into the message box, which most will not do. An Enthuse
-fundraising page created for Tally would give a real running total and a page
-that can be linked to and celebrated. Needs an account and a decision from
-Matt; worth it only if the app finds an audience.
+Open a real manuscript in Word, note its figure, and compare. A small gap is
+expected and documented — Tally does not count punctuation-only tokens — but a
+large one would mean the extraction is wrong. The place to look is
+`counter.py::_docx_text`, and specifically which tags are treated as breaks.
 
-## 3. Replace the hero image with a real screenshot
+## 4. A dedicated fundraising page for 2wish
 
-`assets/hero.png` is a rendering of the design, not a photograph of the app.
-It is honest as a mockup but it should not stay in the README once the real
-thing exists. Shift-Cmd-4, then Space, then click the panel.
+Donations currently go to 2wish's general form, and attribution depends on
+someone typing "Tally" into the message box, which most people will not do. A
+fundraising page created for Tally would give a real running total and
+something worth linking to. Needs an account, so it is a decision rather than
+a task.
 
-## 4. Verify the count against Word itself
-
-Open a real manuscript in Word, note its count, and compare. A small gap is
-expected and documented (Tally does not count punctuation-only tokens) but a
-large one means the extraction is wrong. If they diverge badly, the place to
-look is `counter.py::_docx_text` and which tags are treated as breaks.
-
-## 5. Decide on the GitHub account
-
-The repo is on `jzm8mpgm`, which has no display name and looks auto-generated.
-If this is to be a public project with Matt's name on it, that should be
-settled before it gets any attention.
-
-## 6. Code signing and notarisation
+## 5. Code signing and notarisation
 
 Every new user currently meets "unidentified developer" and has to right-click
-to open. An Apple Developer account (£79/year) removes that, and the signing
-step slots into the existing release workflow. Worth it only if the app finds
-an audience — revisit after it has been shared.
+to open. An Apple Developer account removes that, and the signing step slots
+into the existing release workflow. Worth doing only once the app has an
+audience.
 
-## Ideas, not yet committed to
+## Ideas, not committed to
 
-- `.pages`, `.rtf` and `.odt` support
+- `.pages`, `.rtf` and `.odt`
 - Export the writing history as CSV
 - Weekly goals as well as daily
-- A "since I started this session" count, distinct from "today"
+- A "since I sat down" count, distinct from "today"
+- Localisation
+
+---
+
+## Done
+
+**2026-08-30 — the first three bugs.** The popover clipped its own header; the
+ellipsis button was invisible; Ctrl-C would not quit it. All three are the kind
+that only appear when a person actually runs the thing. See the journal.

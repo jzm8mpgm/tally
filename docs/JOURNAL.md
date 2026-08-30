@@ -1,50 +1,55 @@
 # Journal
 
-Written by the coding session, read by the planning session. Newest first.
+What changed and why, newest first. Shorter than a commit log and longer than
+a changelog: this is the place for reasoning that would otherwise be lost.
 
 ---
 
-## 2026-08-30 — First run on a real Mac; popover sizing fixed; 2wish added
+## 2026-08-30 — First run, and three bugs
 
-Matt ran it. The menu bar count works. One real bug: the popover kept the
-content size it had when first shown — the empty state, before any documents
-were added — so once documents arrived the panel was about 125pt too short and
-the header, the total and the subtitle were clipped off the top edge.
+Tally ran on a real Mac for the first time and immediately produced three
+faults, none of which any amount of static checking would have found.
 
-`setPreferredContentSize_` alone does not move an NSPopover that has already
-been displayed. The fix is for the panel to hold a reference to its popover and
-set `contentSize` directly at the end of `_layout`. See
-`panel.py::attach_popover`.
+**The popover clipped its own header.** `NSPopover` keeps the content size it
+had when first shown, and `setPreferredContentSize_` does not reliably move it
+afterwards. Launching with no documents laid out the short empty state; once
+documents were added the panel grew to around 490pt while the popover stayed
+at roughly 360, cutting the project name, the total and the subtitle off the
+top edge. The panel now holds a reference to its popover and sets
+`contentSize` directly at the end of `_layout`.
 
-Also added donation routing to 2wish rather than to the author: a `⋯ → Support
-2wish…` menu item, a button in the About box, `.github/FUNDING.yml` for the
-repo's Sponsor button, and a README section. Attribution is carried two ways —
-UTM tags on the URL for 2wish's analytics, and a prompt asking donors to write
-"Tally" in the donation form's message box, which is what actually reaches a
-human.
+**The ellipsis button was invisible.** It was an SF Symbol *template* image
+drawn by hand with `drawInRect_`. Template images are only tinted when AppKit
+hosts them inside a control; drawn directly they render as literal black,
+which on a dark popover is nothing at all. It is now three drawn circles
+taking their colour from the semantic palette, which cannot fail in either
+appearance.
 
-## 2026-08-30 — Rebuild and first publish (Cowork planning session)
+**Ctrl-C would not quit it.** A Python signal handler only runs between
+bytecode instructions, and while the AppKit event loop holds control the
+interpreter is executing none — so `^C` echoed and nothing happened. The
+handler now raises a flag and the one-second heartbeat, being the next Python
+code to run, quits on it. SIGTERM is handled the same way.
+
+Also added: support routing to 2wish rather than to the author — a menu item,
+a button in the About box, `.github/FUNDING.yml`, and a README section.
+Attribution rides on UTM tags for 2wish's analytics and, more usefully, on a
+prompt asking donors to write "Tally" in the donation form's message box.
+
+## 2026-08-30 — Rebuild and first publish
 
 Replaced the original draft entirely. It had been two separate programs — a
 Tkinter window and a rumps menu bar script — and neither could grow into what
 was wanted.
 
-What was built: a single PyObjC app with a real drawn panel (large total,
-goal bar, hoverable fourteen-day chart, document rows with hover and context
-menus), projects, daily goals, and history. Counting rewritten to read OOXML
-directly, dropping python-docx and picking up table text the old version
-missed. Dependencies down to two: `pyobjc-framework-Cocoa` and `watchdog`.
+Built: a single PyObjC app with a drawn panel (large total, goal bar,
+hoverable fourteen-day chart, document rows with hover and context menus),
+projects, daily goals and history. Counting rewritten to read OOXML directly,
+dropping python-docx and picking up table text the old version missed.
+Dependencies down to two.
 
-Published to github.com/jzm8mpgm/tally, MIT, with a generated app icon,
-README, contributing guide, PyInstaller spec and a release workflow.
-
-CI is green: 37 unit tests on Linux, plus a macOS job that imports the whole
-AppKit layer — added deliberately, because PyObjC validates selector
-signatures at class-creation time, so that import catches a class of mistake
-Linux never can. The app builds into a .app successfully.
-
-**Not verified: the app has never actually been run.** See backlog item 1.
-
-Known loose ends:
-- `assets/hero.png` is a rendering, not a screenshot.
-- The repo owner account has no display name set.
+CI runs 37 unit tests on Linux, then on a macOS runner imports the whole
+AppKit layer before building the app. That import step is deliberate: PyObjC
+validates selector signatures when a class is created, so importing these
+modules is the cheapest way to catch a selector-arity mistake. It cannot,
+as the entry above shows, catch anything about how the app looks.

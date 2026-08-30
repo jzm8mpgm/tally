@@ -20,6 +20,10 @@ They share nothing but this repository, so the protocol is:
 Architectural decisions that outlive a single task go in `docs/DECISIONS.md`.
 If you are about to contradict one, say so explicitly rather than quietly.
 
+**These files are public.** Write them for a stranger who has just found the
+repository, not as notes between two sessions. Nothing about accounts,
+credentials or private decisions goes in them.
+
 ## Architecture
 
 | File | Responsibility |
