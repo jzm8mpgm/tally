@@ -39,9 +39,9 @@ expected and documented — Tally does not count punctuation-only tokens — but
 large one would mean the extraction is wrong. The place to look is
 `counter.py::_docx_text`, and specifically which tags are treated as breaks.
 
-## 4. A dedicated fundraising page for 2wish
+## 4. A dedicated fundraising page for 2Wish
 
-Donations currently go to 2wish's general form, and attribution depends on
+Donations currently go to 2Wish's general form, and attribution depends on
 someone typing "Tally" into the message box, which most people will not do. A
 fundraising page created for Tally would give a real running total and
 something worth linking to. Needs an account, so it is a decision rather than
