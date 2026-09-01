@@ -64,6 +64,10 @@ almost certainly the wrong shape for this app.
 
 ## Pull requests
 
+If you have a large change in mind — a new file format, a new UI area, a
+significant refactor — please open an issue first so we can talk through the
+approach before you invest the time.
+
 Small and focused is easier to review than large and sweeping. Please describe
 what the change does and, if it touches the interface, say which macOS version
 you tried it on.
