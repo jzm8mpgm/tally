@@ -12,3 +12,6 @@ dist/
 
 # macOS
 .DS_Store
+
+# Claude Code local settings and custom commands
+.claude/
