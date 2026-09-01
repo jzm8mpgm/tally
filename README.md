@@ -150,6 +150,18 @@ sent anywhere — Tally makes no network connections at all.
 Two dependencies: `pyobjc-framework-Cocoa` for the interface, and `watchdog`
 for the filesystem events. Word documents are parsed with the standard library.
 
+## The app I actually write in
+
+Tally counts words; it doesn't write them. I do that in
+[**Ulysses**](https://ulysses.app/drmattmorgan/) — a distraction-free writing
+app for Mac, iPad and iPhone that keeps everything as plain text and
+Markdown, and exports to Word, PDF, ebook, or wherever it needs to go next.
+Tally exists because I wanted the count without leaving it.
+
+I'm on Ulysses's Ambassador programme, so that link is my own referral link —
+a genuine recommendation, not a paid placement. If you're looking for
+somewhere to write the documents Tally is going to count, it's worth a look.
+
 ## If it helps you, help 2wish
 
 Tally is free, and I am not asking for anything for it. If it has earned

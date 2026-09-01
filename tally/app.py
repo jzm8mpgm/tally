@@ -65,6 +65,10 @@ DONATION_URL = (
     "#!/"
 )
 
+# I write in Ulysses myself, and I'm on their Ambassador programme — this is
+# my own referral link, disclosed as such wherever it appears.
+ULYSSES_URL = "https://ulysses.app/drmattmorgan/"
+
 SAVE_INTERVAL = 45.0
 
 FILE_TYPES = sorted(ext.lstrip(".") for ext in SUPPORTED_EXTS)
@@ -378,6 +382,7 @@ class TallyApp(NSObject):
 
         menu.addItem_(NSMenuItem.separatorItem())
         self._item(menu, "Refresh Now", "refreshNow:")
+        self._item(menu, "Try Ulysses…", "tryUlysses:")
         self._item(menu, "Support 2wish…", "donate:")
         self._item(menu, f"About Tally {__version__}", "showAbout:")
         menu.addItem_(NSMenuItem.separatorItem())
@@ -493,6 +498,25 @@ class TallyApp(NSObject):
                 NSURL.URLWithString_(DONATION_URL)
             )
 
+    def tryUlysses_(self, sender):  # noqa: N802
+        self._close_popover()
+        alert = NSAlert.alloc().init()
+        alert.setMessageText_("The app I actually write in")
+        alert.setInformativeText_(
+            "Tally counts words; it doesn't write them. I do that in "
+            "Ulysses — a distraction-free writing app for Mac, iPad and "
+            "iPhone that keeps everything as plain text and Markdown, and "
+            "exports to Word, PDF, ebook or wherever it needs to go next. "
+            "Tally exists because I wanted the count without leaving it.\n\n"
+            "I'm on Ulysses's Ambassador programme, so the link below is my "
+            "own referral link — a genuine recommendation, not a paid one."
+        )
+        alert.addButtonWithTitle_("Try Ulysses")
+        alert.addButtonWithTitle_("Not now")
+        NSApp.activateIgnoringOtherApps_(True)
+        if alert.runModal() == NSAlertFirstButtonReturn:
+            NSWorkspace.sharedWorkspace().openURL_(NSURL.URLWithString_(ULYSSES_URL))
+
     def showAbout_(self, sender):  # noqa: N802
         self._close_popover()
         alert = NSAlert.alloc().init()
@@ -502,11 +526,13 @@ class TallyApp(NSObject):
             "menu bar.\n\nFree and open source, under the MIT licence. "
             "If it has been useful, please give to 2wish — bereavement "
             "support for families after the sudden death of a child or young "
-            "adult — rather than to me."
+            "adult — rather than to me.\n\nI write in Ulysses myself; it's "
+            "why Tally exists."
         )
         alert.addButtonWithTitle_("Close")
         alert.addButtonWithTitle_("View on GitHub")
         alert.addButtonWithTitle_("Support 2wish")
+        alert.addButtonWithTitle_("Try Ulysses")
         NSApp.activateIgnoringOtherApps_(True)
         response = alert.runModal()
         if response == NSAlertFirstButtonReturn + 1:
@@ -515,6 +541,8 @@ class TallyApp(NSObject):
             NSWorkspace.sharedWorkspace().openURL_(
                 NSURL.URLWithString_(DONATION_URL)
             )
+        elif response == NSAlertFirstButtonReturn + 3:
+            NSWorkspace.sharedWorkspace().openURL_(NSURL.URLWithString_(ULYSSES_URL))
 
     def quitTally_(self, sender):  # noqa: N802
         self.engine.stop()

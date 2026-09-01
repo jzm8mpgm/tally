@@ -5,6 +5,20 @@ a changelog: this is the place for reasoning that would otherwise be lost.
 
 ---
 
+## 2026-09-01 — A mention for Ulysses
+
+Added a personal recommendation for Ulysses, the writing app I actually draft
+in — Tally only ever counts what got written somewhere else. It follows the
+same shape as the existing 2wish support: a README section, a menu item
+("Try Ulysses…"), a line and button in the About box. Unlike 2wish this isn't
+a charitable ask, so the copy says plainly that the link is my own Ulysses
+Ambassador referral link rather than leaving it implicit.
+
+`ULYSSES_URL` sits next to `DONATION_URL` in `tally/app.py`. No new
+dependencies, no network access from the app itself — same as before, the
+only network calls are `NSWorkspace` handing a URL to the user's browser when
+they click a button, same as the existing GitHub and donation links.
+
 ## 2026-08-30 — First run, and three bugs
 
 Tally ran on a real Mac for the first time and immediately produced three
