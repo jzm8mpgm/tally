@@ -1,0 +1,29 @@
+name: ops-desk dashboard
+
+on:
+  schedule:
+    - cron: '0 9 * * 0'   # Sunday 9am UTC (9am GMT / 10am BST)
+  workflow_dispatch:        # allow manual trigger
+
+jobs:
+  dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 50   # enough history for git log --since queries
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic/claude-code
+
+      - name: Run dashboard and post to ops-desk
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPS_DESK_TOKEN: ${{ secrets.OPS_DESK_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          claude -p "$(cat .github/ops-desk-dashboard.md)" --dangerously-skip-permissions
