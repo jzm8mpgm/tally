@@ -1,0 +1,43 @@
+name: Weekly clone stats
+
+# The weekly dashboard is a Claude Code cloud routine (not this workflow —
+# see .github/cloud-dashboard-prompt.md). It can reach GitHub's issues, PRs
+# and repo-stats APIs through an MCP connector, but nothing there exposes
+# the traffic/clones endpoint, and that endpoint needs push-level access
+# that a cloud sandbox has no credential for anyway. A GitHub Actions
+# runner already has both (the default GITHUB_TOKEN, and gh preinstalled),
+# so this job's only purpose is to write that one number into the repo as
+# a plain file the routine can read like any other doc.
+
+on:
+  schedule:
+    # 19:15 UTC Sunday — ahead of the dashboard routine's 20:00 UTC run,
+    # so the committed file is always same-day fresh when it's read.
+    - cron: "15 19 * * 0"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  update-clone-stats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch clone traffic
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p docs/metrics
+          gh api "repos/${{ github.repository }}/traffic/clones" \
+            --jq '{count, uniques, fetched_at: (now | todate)}' \
+            > docs/metrics/clones.json
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/metrics/clones.json
+          git diff --cached --quiet || git commit -m "Update weekly clone stats"
+          git push
