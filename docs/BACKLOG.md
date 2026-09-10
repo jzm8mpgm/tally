@@ -27,19 +27,7 @@ well explored. Worth checking, and worth an issue if any of it is wrong:
 - Light mode. Everything so far has been looked at in dark mode.
 - Increased-contrast and reduce-transparency accessibility settings.
 
-## 2. A real screenshot
-
-`assets/hero.png` is a rendering of the interface, not a photograph of it. It
-is accurate, but it should be replaced by the real thing.
-
-## 3. Check the count against Word itself
-
-Open a real manuscript in Word, note its figure, and compare. A small gap is
-expected and documented — Tally does not count punctuation-only tokens — but a
-large one would mean the extraction is wrong. The place to look is
-`counter.py::_docx_text`, and specifically which tags are treated as breaks.
-
-## 4. A dedicated fundraising page for 2wish
+## 2. A dedicated fundraising page for 2wish
 
 Donations currently go to 2wish's general form, and attribution depends on
 someone typing "Tally" into the message box, which most people will not do. A
@@ -47,7 +35,7 @@ fundraising page created for Tally would give a real running total and
 something worth linking to. Needs an account, so it is a decision rather than
 a task.
 
-## 5. Code signing and notarisation
+## 3. Code signing and notarisation
 
 Every new user currently meets "unidentified developer" and has to right-click
 to open. An Apple Developer account removes that, and the signing step slots
@@ -65,6 +53,13 @@ audience.
 ---
 
 ## Done
+
+**2026-09-10 — a real screenshot.** `assets/hero.png` is now a photograph of
+the running app rather than a rendering.
+
+**2026-09-10 — count checked against Word.** Compared Tally's figure against
+Word's own count on a real manuscript; the gap is the expected, documented
+one (punctuation-only tokens), not an extraction bug.
 
 **2026-08-30 — the first three bugs.** The popover clipped its own header; the
 ellipsis button was invisible; Ctrl-C would not quit it. All three are the kind

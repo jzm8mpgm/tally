@@ -2,9 +2,10 @@ Run the following commands in parallel and format the results as a short scannab
 
 1. `gh issue list --repo jzm8mpgm/tally --state open --json number,title,labels,createdAt`
 2. `gh pr list --repo jzm8mpgm/tally --state open --json number,title,createdAt,reviews,statusCheckRollup`
-3. `git log main --since="7 days ago" --oneline`
+3. `git fetch origin main && git log origin/main --since="7 days ago" --oneline`
 4. `gh repo view jzm8mpgm/tally --json stargazerCount,watchers,forkCount`
 5. `python3 -m unittest discover -s tests -t . 2>&1 | tail -5`
+6. `gh api repos/jzm8mpgm/tally/traffic/clones --jq '{count, uniques}'` (14-day rolling window; requires push access, which the authenticated account has)
 
 Also read these files in parallel:
 - `docs/BACKLOG.md` — show only the open (not Done) items, one line each, in priority order
@@ -21,9 +22,9 @@ Group open issues by bug vs feature request (use labels; if unlabelled, use your
 For each open PR: title, check status (passing/failing/pending), and how long it has been open. If none, say "None open".
 
 ### PRs awaiting your review (>1 week)
-PRs open more than 7 days with no review from Matt Morgan. If none, say "None".
+PRs open more than 7 days with no review from GitHub user `jzm8mpgm` (Matt Morgan). If none, say "None".
 
-### Commits to `main` — last 7 days
+### Commits to `origin/main` — last 7 days
 Count + short list of commit summaries (show up to 5, then "*(N more)*" if there are more).
 
 ### Tests
@@ -36,4 +37,4 @@ Numbered open items in priority order.
 Date + first paragraph of the most recent entry.
 
 ### GitHub Stats
-Stars / Watchers / Forks in a small table.
+Stars / Watchers / Forks / Clones (14 days, total and unique) in a small table.
