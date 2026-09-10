@@ -13,5 +13,5 @@ dist/
 # macOS
 .DS_Store
 
-# Claude Code local settings and custom commands
-.claude/
+# Claude Code — machine-specific overrides only
+.claude/settings.local.json

@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh issue:*)",
+      "Bash(gh pr:*)",
+      "Bash(gh repo:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(git push:*)",
+      "Skill(schedule)",
+      "Bash(python3 -m unittest discover -s tests -t .)"
+    ]
+  }
+}
