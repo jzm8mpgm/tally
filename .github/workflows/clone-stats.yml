@@ -3,11 +3,16 @@ name: Weekly clone stats
 # The weekly dashboard is a Claude Code cloud routine (not this workflow —
 # see .github/cloud-dashboard-prompt.md). It can reach GitHub's issues, PRs
 # and repo-stats APIs through an MCP connector, but nothing there exposes
-# the traffic/clones endpoint, and that endpoint needs push-level access
-# that a cloud sandbox has no credential for anyway. A GitHub Actions
-# runner already has both (the default GITHUB_TOKEN, and gh preinstalled),
-# so this job's only purpose is to write that one number into the repo as
-# a plain file the routine can read like any other doc.
+# the traffic/clones endpoint. This job's only purpose is to write that one
+# number into the repo as a plain file the routine can read like any other
+# doc.
+#
+# The default GITHUB_TOKEN can't fetch it either — traffic/insights data
+# needs an actual push-access credential, which a GitHub App installation
+# token (what GITHUB_TOKEN is) can never be granted, regardless of the
+# `permissions:` block below. TRAFFIC_READ_TOKEN is a fine-grained PAT
+# scoped to just this repo with Administration: Read-only — enough to read
+# traffic stats, nothing else. GITHUB_TOKEN still does the commit/push.
 
 on:
   schedule:
@@ -27,7 +32,7 @@ jobs:
 
       - name: Fetch clone traffic
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.TRAFFIC_READ_TOKEN }}
         run: |
           mkdir -p docs/metrics
           gh api "repos/${{ github.repository }}/traffic/clones" \
