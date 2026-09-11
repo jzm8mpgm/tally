@@ -1,8 +1,10 @@
 import os
 import tempfile
+import threading
+import time
 import unittest
 
-from tally.engine import Engine, _prune_nested, source_for
+from tally.engine import Engine, FileWatcher, _prune_nested, source_for
 from tally.store import State
 
 from .test_counter import make_docx
@@ -105,6 +107,53 @@ class TestEngine(unittest.TestCase):
         # by hand — today's progress should be unaffected.
         self.assertEqual(self.engine.written_today, 0)
         self.assertEqual(self.state.written_today(self.state.active.id), 0)
+
+
+class _SlowJoinObserver:
+    """Stands in for a watchdog Observer whose thread is slow to acknowledge
+    stop() — e.g. because it is mid-way through handling a batch of FSEvents.
+    """
+
+    def __init__(self, join_seconds=0.5):
+        self._join_seconds = join_seconds
+        self.stopped = False
+        self.joined = threading.Event()
+
+    def stop(self):
+        self.stopped = True
+
+    def join(self, timeout=None):
+        time.sleep(self._join_seconds)
+        self.joined.set()
+
+
+class TestFileWatcherStop(unittest.TestCase):
+    """Switching, deleting, or creating a project all resync the watcher on
+    the main thread. FileWatcher.stop() used to call observer.join() inline,
+    which could block the caller — and so the whole UI — for as long as its
+    timeout. That made every one of those actions feel like it "sometimes
+    doesn't work": the app was simply frozen for up to 1.5 seconds.
+    """
+
+    def test_stop_returns_before_the_observer_finishes_joining(self):
+        watcher = FileWatcher(lambda: None)
+        slow = _SlowJoinObserver(join_seconds=0.5)
+        watcher._observer = slow
+
+        started = time.monotonic()
+        watcher.stop()
+        elapsed = time.monotonic() - started
+
+        self.assertLess(elapsed, 0.1, "stop() blocked on the observer join")
+        self.assertTrue(slow.stopped)
+        self.assertIsNone(watcher._observer)
+        # The join still has to happen somewhere — just not on our thread.
+        self.assertTrue(slow.joined.wait(timeout=2.0))
+
+    def test_stop_on_an_unwatched_watcher_is_a_no_op(self):
+        watcher = FileWatcher(lambda: None)
+        watcher.stop()  # must not raise when nothing was ever watched
+        self.assertFalse(watcher.active)
 
 
 class TestPruneNested(unittest.TestCase):

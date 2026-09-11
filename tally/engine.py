@@ -122,13 +122,34 @@ class FileWatcher:
             self._observer = None
 
     def stop(self) -> None:
+        """Signal the observer to stop without blocking the caller.
+
+        ``watch()`` calls this every time the set of watched directories
+        changes — which happens on the main thread whenever a project is
+        switched, added, deleted, or has a source added or removed. An
+        observer thread can take a while to acknowledge ``stop()`` (it may be
+        mid-way through handling a batch of FSEvents), and joining it inline
+        here used to block the main thread — and therefore the whole UI —
+        for as long as 1.5 seconds on exactly those actions. Finishing the
+        join on a throwaway background thread keeps this call, and whatever
+        menu action triggered it, instant.
+        """
         observer, self._observer = self._observer, None
         if observer is None:
             return
         try:
             observer.stop()
-            observer.join(timeout=1.5)
-        except Exception:  # pragma: no cover
+        except Exception:  # pragma: no cover - watcher is best effort
+            return
+        threading.Thread(
+            target=self._join_observer, args=(observer,), daemon=True
+        ).start()
+
+    @staticmethod
+    def _join_observer(observer) -> None:  # pragma: no cover - background cleanup
+        try:
+            observer.join(timeout=5.0)
+        except Exception:
             pass
 
 
