@@ -95,6 +95,18 @@ class Project:
             sources=[Source.from_json(s) for s in data.get("sources", [])],
         )
 
+    def remove_source(self, path: str) -> bool:
+        """Drop the source whose path is exactly ``path``.
+
+        A file source and a folder source are both removed the same way —
+        by an exact match against ``Source.path`` — so this is the one place
+        that knows how. Returns whether anything was actually removed.
+        """
+        remaining = [source for source in self.sources if source.path != path]
+        removed = len(remaining) != len(self.sources)
+        self.sources = remaining
+        return removed
+
 
 @dataclass
 class Settings:

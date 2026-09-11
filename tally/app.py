@@ -279,15 +279,20 @@ class TallyApp(NSObject):
 
     def removePath_(self, path):  # noqa: N802
         project = self.state.active
-        remaining = [source for source in project.sources if source.path != path]
-        if len(remaining) == len(project.sources):
+        if not project.remove_source(path):
             self._alert(
                 "That document is inside a watched folder",
                 "Remove the folder from this project to stop counting it.",
             )
             return
-        project.sources = remaining
         self._reload(sources_changed=True)
+
+    def removeSource_(self, path):  # noqa: N802
+        # Same removal as removePath_, but used where the caller already
+        # knows it is naming a source (a folder's own path) rather than a
+        # document that might live inside one — so no fallback alert.
+        if self.state.active.remove_source(path):
+            self._reload(sources_changed=True)
 
     def openPath_(self, path):  # noqa: N802
         if path and os.path.exists(path):
@@ -320,6 +325,11 @@ class TallyApp(NSObject):
         menu.popUpMenuPositioningItem_atLocation_inView_(
             None, (0, sender.frame().size.height + 2), sender
         )
+
+    @objc.python_method
+    def _source_label(self, source):
+        name = os.path.basename(source.path.rstrip("/")) or source.path
+        return f"“{name}”" if source.is_folder else name
 
     def showProjectMenu_(self, sender):  # noqa: N802
         menu = NSMenu.alloc().init()
@@ -379,6 +389,22 @@ class TallyApp(NSObject):
         self._item(
             menu, "Open at Login", "toggleLoginItem:", ticked=login_item.is_enabled()
         )
+
+        if self.state.active.sources:
+            menu.addItem_(NSMenuItem.separatorItem())
+            submenu = NSMenu.alloc().init()
+            for source in self.state.active.sources:
+                self._item(
+                    submenu,
+                    f"Remove {self._source_label(source)}",
+                    "removeSourceFromMenu:",
+                    represented=source.path,
+                )
+            parent = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(
+                "Manage Sources", None, ""
+            )
+            menu.addItem_(parent)
+            menu.setSubmenu_forItem_(submenu, parent)
 
         menu.addItem_(NSMenuItem.separatorItem())
         self._item(menu, "Refresh Now", "refreshNow:")
@@ -440,6 +466,21 @@ class TallyApp(NSObject):
         self.state.remove_project(project.id)
         self._reload(project_changed=True)
         self._show_popover()
+
+    def removeSourceFromMenu_(self, sender):  # noqa: N802
+        path = sender.representedObject()
+        project = self.state.active
+        source = next((s for s in project.sources if s.path == path), None)
+        if source is None:
+            return
+        if not self._confirm(
+            f"Remove {self._source_label(source)}?",
+            "Tally will stop counting it. Your files are untouched.",
+            "Remove",
+        ):
+            return
+        if project.remove_source(path):
+            self._reload(sources_changed=True)
 
     def editGoal_(self, sender):  # noqa: N802
         project = self.state.active

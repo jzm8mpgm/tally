@@ -44,6 +44,9 @@ class Document:
     missing: bool = False
     # Which source it came from — a folder name, or "" for a hand-picked file.
     group: str = ""
+    # The folder source's own path, so it can be removed as a unit. "" for a
+    # hand-picked file, where ``path`` already is the source.
+    source_path: str = ""
 
     @property
     def ok(self) -> bool:
@@ -172,9 +175,9 @@ class Engine:
 
     # ── scanning ─────────────────────────────────────────────────────
 
-    def _resolve(self, project: Project) -> list[tuple[str, str]]:
-        """``(path, group_label)`` for every document in the project."""
-        resolved: list[tuple[str, str]] = []
+    def _resolve(self, project: Project) -> list[tuple[str, str, str]]:
+        """``(path, group_label, source_path)`` for every document in the project."""
+        resolved: list[tuple[str, str, str]] = []
         seen: set[str] = set()
         for source in project.sources:
             if source.is_folder:
@@ -182,11 +185,11 @@ class Engine:
                 for path in documents_in_folder(source.path, source.recursive):
                     if path not in seen:
                         seen.add(path)
-                        resolved.append((path, label))
+                        resolved.append((path, label, source.path))
             else:
                 if source.path not in seen:
                     seen.add(source.path)
-                    resolved.append((source.path, ""))
+                    resolved.append((source.path, "", ""))
         return resolved
 
     def watch_directories(self, project: Project) -> set[str]:
@@ -207,11 +210,17 @@ class Engine:
         documents: list[Document] = []
         total = characters = readable = problems = 0
 
-        for path, group in self._resolve(project):
+        for path, group, source_path in self._resolve(project):
             name = os.path.splitext(os.path.basename(path))[0]
             if not os.path.exists(path):
                 documents.append(
-                    Document(path=path, name=name, missing=True, group=group)
+                    Document(
+                        path=path,
+                        name=name,
+                        missing=True,
+                        group=group,
+                        source_path=source_path,
+                    )
                 )
                 problems += 1
                 continue
@@ -219,7 +228,13 @@ class Engine:
                 count = self.cache.count(path)
             except UnreadableDocument as exc:
                 documents.append(
-                    Document(path=path, name=name, error=str(exc), group=group)
+                    Document(
+                        path=path,
+                        name=name,
+                        error=str(exc),
+                        group=group,
+                        source_path=source_path,
+                    )
                 )
                 problems += 1
                 continue
@@ -230,6 +245,7 @@ class Engine:
                     words=count.words,
                     characters=count.characters,
                     group=group,
+                    source_path=source_path,
                 )
             )
             total += count.words

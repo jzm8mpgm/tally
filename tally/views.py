@@ -379,14 +379,26 @@ class DocumentRow(HoverView):
     def menuForEvent_(self, event):  # noqa: N802
         if self._document is None or self._delegate is None:
             return None
-        menu = NSMenu.alloc().init()
+        document = self._document
+        # A folder member has no source of its own to remove one file from —
+        # the folder itself is the unit that was added, so it is the unit
+        # that comes off.
+        if document.group:
+            removal = (
+                f"Remove Folder “{document.group}”",
+                "removeFolderFromMenu:",
+                document.source_path,
+            )
+        else:
+            removal = ("Remove from Project", "removeDocumentFromMenu:", document.path)
         entries = (
-            ("Open", "openDocumentFromMenu:"),
-            ("Reveal in Finder", "revealDocumentFromMenu:"),
-            (None, None),
-            ("Remove from Project", "removeDocumentFromMenu:"),
+            ("Open", "openDocumentFromMenu:", document.path),
+            ("Reveal in Finder", "revealDocumentFromMenu:", document.path),
+            (None, None, None),
+            removal,
         )
-        for title, selector in entries:
+        menu = NSMenu.alloc().init()
+        for title, selector, represented in entries:
             if title is None:
                 menu.addItem_(NSMenuItem.separatorItem())
                 continue
@@ -394,7 +406,7 @@ class DocumentRow(HoverView):
                 title, selector, ""
             )
             item.setTarget_(self._delegate)
-            item.setRepresentedObject_(self._document.path)
+            item.setRepresentedObject_(represented)
             menu.addItem_(item)
         return menu
 

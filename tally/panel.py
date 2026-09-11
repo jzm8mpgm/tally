@@ -201,6 +201,9 @@ class PanelController(NSViewController):
     def removeDocumentFromMenu_(self, sender):  # noqa: N802
         self._app.removePath_(sender.representedObject())
 
+    def removeFolderFromMenu_(self, sender):  # noqa: N802
+        self._app.removeSource_(sender.representedObject())
+
     @objc.python_method
     def _sparkline_hover(self, day, value):
         if day is None:

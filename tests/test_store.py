@@ -76,6 +76,35 @@ class TestProjects(unittest.TestCase):
         self.assertEqual(self.state.active_id, current)
 
 
+class TestRemoveSource(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.state = fresh(self.tmp)
+        self.project = self.state.active
+        self.project.sources = [
+            Source(kind="file", path="/tmp/one.docx"),
+            Source(kind="folder", path="/tmp/chapters", recursive=True),
+        ]
+
+    def test_removes_a_matching_file_source(self):
+        self.assertTrue(self.project.remove_source("/tmp/one.docx"))
+        self.assertEqual([s.path for s in self.project.sources], ["/tmp/chapters"])
+
+    def test_removes_a_matching_folder_source(self):
+        self.assertTrue(self.project.remove_source("/tmp/chapters"))
+        self.assertEqual([s.path for s in self.project.sources], ["/tmp/one.docx"])
+
+    def test_leaves_sources_untouched_when_nothing_matches(self):
+        self.assertFalse(self.project.remove_source("/tmp/ghost.docx"))
+        self.assertEqual(len(self.project.sources), 2)
+
+    def test_a_document_inside_a_folder_is_not_itself_a_match(self):
+        # Only the folder's own path removes it — a file within it is not a
+        # source in its own right.
+        self.assertFalse(self.project.remove_source("/tmp/chapters/one.docx"))
+        self.assertEqual(len(self.project.sources), 2)
+
+
 class TestPersistence(unittest.TestCase):
     def test_round_trip(self):
         tmp = tempfile.mkdtemp()
