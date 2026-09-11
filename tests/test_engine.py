@@ -73,6 +73,39 @@ class TestEngine(unittest.TestCase):
             self.engine.watch_directories(self.state.active), {self.docs}
         )
 
+    def test_folder_members_carry_the_folder_as_their_source_path(self):
+        snapshot = self.engine.refresh()
+        for document in snapshot.documents:
+            self.assertEqual(document.group, "Book")
+            self.assertEqual(document.source_path, self.docs)
+
+    def test_a_hand_picked_file_has_no_group_or_source_path(self):
+        standalone = os.path.join(self.tmp, "standalone.docx")
+        make_docx(standalone, ["solo"])
+        self.state.active.sources = [source_for(standalone)]
+        snapshot = self.engine.refresh()
+        self.assertEqual(len(snapshot.documents), 1)
+        document = snapshot.documents[0]
+        self.assertEqual(document.group, "")
+        self.assertEqual(document.source_path, "")
+
+    def test_removing_a_folder_source_drops_its_documents_and_shifts_baseline(self):
+        self.engine.refresh()
+        self.assertEqual(self.engine.snapshot.total, 6)
+        self.assertEqual(self.engine.written_today, 0)
+
+        removed = self.state.active.remove_source(self.docs)
+        self.assertTrue(removed)
+        self.assertEqual(self.state.active.sources, [])
+
+        snapshot = self.engine.sources_changed()
+        self.assertEqual(snapshot.total, 0)
+        self.assertEqual(snapshot.documents, [])
+        # Losing a folder's worth of words is not the same as deleting them
+        # by hand — today's progress should be unaffected.
+        self.assertEqual(self.engine.written_today, 0)
+        self.assertEqual(self.state.written_today(self.state.active.id), 0)
+
 
 class TestPruneNested(unittest.TestCase):
     def test_child_directories_are_dropped(self):
