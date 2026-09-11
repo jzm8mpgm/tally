@@ -412,6 +412,16 @@ class TallyApp(NSObject):
     def chooseProject_(self, sender):  # noqa: N802
         self.state.active_id = sender.representedObject()
         self._reload(project_changed=True)
+        # Showing the project switcher's menu from the button inside the
+        # popover can itself cause a transient NSPopover to auto-close (it
+        # loses key status to the menu's own tracking session). When that
+        # happens the switch above still lands correctly in `state`, but
+        # nothing on screen shows it, and it looks — intermittently, since
+        # whether the popover auto-closes is timing dependent — as though
+        # choosing a project silently did nothing. Every sibling action here
+        # (new/rename/delete project) already re-shows the popover after
+        # reloading for the same reason; this one was missing it.
+        self._show_popover()
 
     def newProject_(self, sender):  # noqa: N802
         name = self._prompt("New project", "What are you working on?", "Untitled")

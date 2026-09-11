@@ -75,6 +75,52 @@ class TestProjects(unittest.TestCase):
         self.state.active_id = "nonsense"
         self.assertEqual(self.state.active_id, current)
 
+    def test_deleted_project_is_gone_from_every_lookup(self):
+        first = self.state.active_id
+        second = self.state.add_project("Book Four")
+        third = self.state.add_project("Book Five")
+        self.state.active_id = first
+
+        self.state.remove_project(second.id)
+
+        self.assertIsNone(self.state.project(second.id))
+        self.assertNotIn(second.id, [p.id for p in self.state.projects])
+        self.assertEqual(len(self.state.projects), 2)
+        # Deleting a project that was not active must not disturb which
+        # project is active.
+        self.assertEqual(self.state.active_id, first)
+        self.assertEqual(self.state.active.id, first)
+        self.assertIsNotNone(self.state.project(third.id))
+
+    def test_deleting_the_active_project_falls_back_to_the_first_remaining(self):
+        first = self.state.active_id
+        second = self.state.add_project("Book Four")
+        self.state.active_id = second.id
+
+        self.state.remove_project(second.id)
+
+        self.assertEqual(self.state.active_id, first)
+        self.assertEqual(self.state.active.id, first)
+        self.assertIsNone(self.state.project(second.id))
+
+    def test_removing_a_project_drops_its_history(self):
+        second = self.state.add_project("Book Four")
+        self.state.record_total(second.id, 500)
+        self.assertIn(second.id, self.state.history)
+
+        self.state.remove_project(second.id)
+
+        self.assertNotIn(second.id, self.state.history)
+
+    def test_removing_an_already_removed_project_is_a_no_op(self):
+        second = self.state.add_project("Book Four")
+        self.state.remove_project(second.id)
+        before = [p.id for p in self.state.projects]
+
+        self.state.remove_project(second.id)  # deleting it again must not error
+
+        self.assertEqual([p.id for p in self.state.projects], before)
+
 
 class TestPersistence(unittest.TestCase):
     def test_round_trip(self):

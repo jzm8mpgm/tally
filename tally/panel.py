@@ -59,6 +59,7 @@ class PanelController(NSViewController):
         self._rows = []
         self._row_paths = []
         self._subtitle_text = ""
+        self._row_project_id = None
         return self
 
     @objc.python_method
@@ -261,13 +262,18 @@ class PanelController(NSViewController):
             "Last 14 days", f"{streak}-day streak" if streak >= 2 else ""
         )
 
-        self._rebuild_rows(snapshot.documents)
+        self._rebuild_rows(project.id, snapshot.documents)
         self._layout()
 
     @objc.python_method
-    def _rebuild_rows(self, documents):
+    def _rebuild_rows(self, project_id, documents):
         paths = [document.path for document in documents]
-        if paths == self._row_paths and len(self._rows) == len(documents):
+        same_project = project_id == self._row_project_id
+        if (
+            same_project
+            and paths == self._row_paths
+            and len(self._rows) == len(documents)
+        ):
             for row, document in zip(self._rows, documents):
                 row.configure(document, self)
             return
@@ -276,6 +282,7 @@ class PanelController(NSViewController):
             row.removeFromSuperview()
         self._rows = []
         self._row_paths = paths
+        self._row_project_id = project_id
 
         width = self._list.frame().size.width
         y = 0.0
