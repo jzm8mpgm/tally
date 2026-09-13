@@ -86,8 +86,13 @@ Send it via the Gmail MCP tool to **mattmorgan@me.com**, subject
 
 Then publish the hosted page: render the same content into the shared shell
 (`Dashboards/template/dashboard-artifact.html.tmpl`'s structure — accent
-`#4A63E0` light / `#7B93FF` dark) and use the `Artifact` tool to publish it
-with `url` set to `https://claude.ai/code/artifact/7fb1aebe-650f-4ee9-b948-a84342fc0c36`
+`#4A63E0` light / `#7B93FF` dark). The header must include the "Run now ↗"
+button linking to `https://claude.ai/code/routines/trig_018tiWit297qbHwwcjsR93nq`
+(a published page can't fire a cloud run itself, so this deep-links to the
+routine's own page where one click does) — keep rendering it every run, it's
+easy to drop when regenerating the page from scratch. Use the `Artifact`
+tool to publish it with `url` set to
+`https://claude.ai/code/artifact/7fb1aebe-650f-4ee9-b948-a84342fc0c36`
 so it updates in place rather than creating a new page.
 
 Then refresh the hub's registry: `Artifact` `write_db`, url

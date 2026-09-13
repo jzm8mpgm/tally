@@ -42,6 +42,6 @@ Latest Journal Entry — date + first paragraph of the most recent entry in `doc
 
 ## Publish the hosted artifact
 
-Render the report above into the shared shell (`Dashboards/template/dashboard-artifact.html.tmpl`'s structure — same sections/order, accent `#4A63E0` light / `#7B93FF` dark) and publish it via the `Artifact` tool with `url` set to `https://claude.ai/code/artifact/7fb1aebe-650f-4ee9-b948-a84342fc0c36` so it updates in place.
+Render the report above into the shared shell (`Dashboards/template/dashboard-artifact.html.tmpl`'s structure — same sections/order, accent `#4A63E0` light / `#7B93FF` dark). The header must include the "Run now ↗" button linking to `https://claude.ai/code/routines/trig_018tiWit297qbHwwcjsR93nq` (a published page can't fire a cloud run itself, so this deep-links to the routine's own page where one click does) — keep rendering it every time, it's easy to drop when regenerating the page from scratch. Publish via the `Artifact` tool with `url` set to `https://claude.ai/code/artifact/7fb1aebe-650f-4ee9-b948-a84342fc0c36` so it updates in place.
 
 Then refresh the hub's registry: `Artifact` `write_db`, url `https://claude.ai/code/artifact/d67645f3-650a-4668-99dd-b9aac1409f82`, `collection: "dashboards"`, `doc_id: "tally"`, `data: {name: "Tally", url: "https://claude.ai/code/artifact/7fb1aebe-650f-4ee9-b948-a84342fc0c36", last_updated: <now, ISO>, has_alerts: <true if the Alerts section is non-empty>}`.
