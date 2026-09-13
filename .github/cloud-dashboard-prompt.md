@@ -10,12 +10,15 @@ It differs from the local `/dashboard` command (`.claude/commands/dashboard.md`)
 because the cloud sandbox has no `gh` CLI — GitHub access there is through an
 MCP connector instead, and it can't reach the traffic/clones endpoint at all
 (see `.github/workflows/clone-stats.yml`, which feeds that one number in as
-a plain file).
+a plain file). Both follow the shared skeleton in `Dashboards/FORMAT.md`
+(`~/Projects/Dashboards` locally, or ask for it if this session doesn't have
+that repo checked out) so the two stay in the same shape even though the
+data-gathering differs.
 
 ---
 
-Produce this week's Tally dashboard and email it. This repo (jzm8mpgm/tally)
-is already cloned into your working directory.
+Produce this week's Tally dashboard, email it, and update its hosted page.
+This repo (jzm8mpgm/tally) is already cloned into your working directory.
 
 There is no `gh` CLI here — use the GitHub MCP tools instead (search the tool
 catalog if you're unsure of exact names or fields). Everything else is Bash
@@ -42,39 +45,57 @@ Gather, in parallel where possible:
 If any single step fails, don't abort the rest — note the failure in that
 section and keep going; a partial dashboard is more useful than none.
 
-Format the result exactly like this:
+Format the result using the shared skeleton — fixed section order, alerts
+first and only when non-empty, omit a section entirely rather than writing
+"none"/"N/A":
 
 ```
 ## Tally Dashboard — {today's date}
 
-### Issues
-Group by bug vs feature request (labels, or best judgement from the title
-if unlabelled). List each as `#number title`. "None open" if empty.
+### ⚠ Alerts
+Only if any test fails, or any open PR has a failing check. Omit otherwise.
 
-### Pull Requests
-For each: title, check status if available, how long it's been open.
-"None open" if empty.
+### Status
+Tests: pass / fail / count. Name any failures.
 
-### PRs awaiting your review (>1 week)
-PRs open more than 7 days with no review from GitHub user `jzm8mpgm`
-(Matt Morgan). "None" if empty.
+### Activity
+One line: `Issues open: N · PRs open: N · Commits to origin/main (7 days): N`,
+then:
+- Open issues, grouped bug vs feature request (labels, or best judgement
+  from the title if unlabelled)
+- Open PRs: title, check status if available, how long open
+- PRs awaiting review >1 week (no review from GitHub user `jzm8mpgm`)
+- Commits: up to 5 summaries, then "*(N more)*" if there are more
 
-### Commits to `origin/main` — last 7 days
-Count + up to 5 summaries, then "*(N more)*" if there are more.
+### Metrics
+GitHub Stats: Stars / Watchers / Forks / Clones (14d) / Unique cloners,
+small table.
 
-### Tests
-Pass / fail / count. Name any failures.
+### Open Items
+Backlog — numbered open items, priority order.
 
-### Backlog
-Numbered open items, priority order.
+### Notes
+Latest Journal Entry — date + first paragraph.
 
-### Latest Journal Entry
-Date + first paragraph.
-
-### GitHub Stats
-Stars / Watchers / Forks / Clones (14d) / Unique cloners, small table.
+### Links
+- Repository — https://github.com/jzm8mpgm/tally
 ```
 
-Send it via the Gmail MCP tool to **drmattmorgan@gmail.com**, subject
-`Tally Dashboard — {today's date}`. End your final message with whether the
-send succeeded.
+Send it via the Gmail MCP tool to **mattmorgan@me.com**, subject
+`Tally Dashboard — {today's date}`.
+
+Then publish the hosted page: render the same content into the shared shell
+(`Dashboards/template/dashboard-artifact.html.tmpl`'s structure — accent
+`#4A63E0` light / `#7B93FF` dark) and use the `Artifact` tool to publish it
+with `url` set to `https://claude.ai/code/artifact/7fb1aebe-650f-4ee9-b948-a84342fc0c36`
+so it updates in place rather than creating a new page.
+
+Then refresh the hub's registry: `Artifact` `write_db`, url
+`https://claude.ai/code/artifact/d67645f3-650a-4668-99dd-b9aac1409f82`,
+`collection: "dashboards"`, `doc_id: "tally"`, `data: {name: "Tally", url:
+"https://claude.ai/code/artifact/7fb1aebe-650f-4ee9-b948-a84342fc0c36",
+last_updated: <now, ISO 8601>, has_alerts: <true if the Alerts section is
+non-empty>}`.
+
+End your final message with whether the email send succeeded and whether
+both artifact updates succeeded.
