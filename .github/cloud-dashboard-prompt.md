@@ -77,6 +77,10 @@ Backlog — numbered open items, priority order.
 ### Notes
 Latest Journal Entry — date + first paragraph.
 
+### Stack
+Static — only update if the stack actually changes:
+- GitHub — repo hosting, releases, CI (macOS test runner) — https://github.com/jzm8mpgm/tally
+
 ### Links
 - Repository — https://github.com/jzm8mpgm/tally
 ```

@@ -37,6 +37,10 @@ Backlog — numbered open items from `docs/BACKLOG.md`, in priority order.
 ### Notes
 Latest Journal Entry — date + first paragraph of the most recent entry in `docs/JOURNAL.md`.
 
+### Stack
+Static — only update if the stack actually changes:
+- GitHub — repo hosting, releases, CI (macOS test runner) — https://github.com/jzm8mpgm/tally
+
 ### Links
 - Repository — https://github.com/jzm8mpgm/tally
 
