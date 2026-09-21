@@ -5,6 +5,14 @@ a changelog: this is the place for reasoning that would otherwise be lost.
 
 ---
 
+## 2026-09-21 — Removed the "First-launch polish" backlog item
+
+Removed from `docs/BACKLOG.md` without doing the underlying checks. It asked
+whether panel sizing, chart hover, click/right-click behaviour, light mode,
+and the accessibility settings still held up beyond the one Mac they'd been
+tested on. If that verification is still wanted, it belongs back on the
+backlog as a fresh item.
+
 ## 2026-09-11 — Deleting and switching projects, and removing a source once added
 
 Three reports from actual use, fixed together since they share the same
